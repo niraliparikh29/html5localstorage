@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Local storage</title>	
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<script>
+$(document).ready(function(){
+  $("#search").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#myTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script>
+<script>
+	
+	function store()
+	{
+		var fname = document.getElementById("fname").value;
+		var lname = document.getElementById("lname").value;
+		var city = document.getElementById("city").value;
+		var gender = document.querySelector('input[name="Gender"]:checked').value;			 	
+				    
+	   	var language = document.querySelectorAll('input[type=checkbox]');
+		var totalLan = [];
+
+		for(var i = 0; i < language.length; i++)
+		{
+			if(language[i].checked)
+			{
+			totalLan.push(language[i].value);
+			}
+		}	    
+
+		if(fname == " ")
+		{
+			alert("Please enter first name");
+			return false;
+		}
+		else if (lname == " ")
+		{
+			alert("Please enter last name");
+			return false;
+		}
+		else if (city == " ")
+		{
+			alert("Please enter city");
+			return false;
+		} 
+
+		
+
+		var obj = { fname : fname,
+					lname : lname,
+					gender : gender,
+					language : totalLan,
+					city : city					
+				};
+
+
+		var list = getList();	
+		list.push(obj);
+		localStorage.setItem("values",JSON.stringify(list));
+		getItem();
+	}
+
+
+	function getList()
+	{
+		var localstore = localStorage.getItem('values');
+		if(localstore)
+		{
+			return JSON.parse(localstore);
+		}
+		else
+		{
+			return []
+		}
+	}
+
+
+	function getItem()
+	{
+		var html = "";
+		
+		var list= getList();
+		if(list.length > 0)
+		{
+			for(var i=0; i < list.length ; i++)
+			{
+				var removebtn = "<button class='btn btn-danger' onclick='removeList("+ i +");'> Remove </button>";
+				html += "<tr><td>" + (i+1)+ "</td> <td>" + list[i].fname + "</td> <td>"+ list[i].lname +"</td> <td>"+list[i].gender+"</td> <td>"+
+				list[i].language+"</td> <td>"+list[i].city+"</td> <td>"+removebtn + "</td> </tr>"; 
+			} 
+		}
+		else
+		{
+			html = "<td> Record not found </td>"
+		}
+
+		document.getElementById('data').innerHTML = html;
+	}
+	function removeList(index)
+	{
+		var list = getList();
+		list.splice(index,1);
+		localStorage.setItem("values",JSON.stringify(list));
+		getItem();
+	}
+	
+function sortTable(n) {
+  var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+  table = document.getElementById("myTable");
+  switching = true;
+ 
+  dir = "asc"; 
+  while (switching) {
+  
+    switching = false;
+    rows = table.rows;
+   
+    for (i = 1; i < (rows.length - 1); i++) {
+      
+      shouldSwitch = false;
+     
+      x = rows[i].getElementsByTagName("TD")[n];
+      y = rows[i + 1].getElementsByTagName("TD")[n];
+      
+      if (dir == "asc") {
+        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+          
+          shouldSwitch = true;
+          break;
+        }
+      } else if (dir == "desc") {
+        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+          
+          shouldSwitch = true;
+          break;
+        }
+      }
+    }
+    if (shouldSwitch) {
+     
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+      
+      switchcount ++; 
+    } else {
+      
+      if (switchcount == 0 && dir == "asc") {
+        dir = "desc";
+        switching = true;
+      }
+    }
+  }
+}
+
+</script>
+<body class = "container">
+	<div class = "row justify-content-center">
+		<div class="col-6">
+			<div class="jumbotron">
+				<form action="#" method="post">
+					<div class="form-group">
+						<label> First name </label>
+						<input type="text" name="fname" id="fname" minlength="2" class="form-control" required/> <br>
+					</div>
+					<div  class="form-group">
+						<label> Last name </label>
+						<input type="text" name="lname" id="lname" class="form-control" /> <br>
+					</div>
+					<div class="form-group">
+						<label> Gender : </label> 
+						<input type="radio" name="Gender"  value="Male" checked> Male 
+						<input type="radio" name="Gender"  value="Female" > Female <br>
+					</div>
+
+					<div id="myform" class="form-group">
+						<label> Hobbies : </label> <br>
+						<input type="checkbox" name="hobbies" value="Music" > Music <br>
+						<input type="checkbox" name="hobbies" value="Reading" > Reading <br>
+						<input type="checkbox" name="hobbies" value="Singing"> Singing <br>
+						<input type="checkbox" name="hobbies" value="Swimming"> Swimming <br>
+						<input type="checkbox" name="hobbies" value="Writing"> Writing <br>
+					</div>
+					<div  class="form-group">
+						<label> City : </label>
+						<input type="text" name="city" id="city" class="form-control"/> <br> <br>
+					</div>
+					
+					<div  class="form-group">
+						<button type="button" onclick="store()" class='btn btn-success'> Add Record </button> 
+						<button type="reset" class='btn btn-success'> Reset </button> 
+						<button type="button" onclick="getItem()" class='btn btn-success'> Get Record </button>		
+					</div>
+				</form>
+			</div>
+			<div>									
+						
+				<p id="display"></p>
+			</div>
+		</div>
+	</div>
+	<div class="jumbotron">
+		<label> Search </label>
+		<input type="search" id="search" placeholder="Search"  />
+	</div>
+			
+	<div class = "row justify-content-center">
+		<div class="col-6">
+			<table  id="myTable" class="table table-striped">
+				<thead>
+					<tr>			
+						<th onclick="sortTable(0)"> Index </th>
+						<th onclick="sortTable(1)"> First Name </th>
+						<th onclick="sortTable(2)"> Last name </th>
+						<th> Gender </th>
+						<th> Hobbies </th>
+						<th onclick="sortTable(3)"> City </th>
+						<th > Action </th>
+					</tr>
+				</thead>
+				<tbody id='data'>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+</html>
+
